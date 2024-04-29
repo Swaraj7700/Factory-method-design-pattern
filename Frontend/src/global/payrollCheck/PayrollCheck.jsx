@@ -9,7 +9,7 @@ const PayrollCheck = () => {
   const [selectedTemplate, setSelectedTemplate] = useState('');
   const [selectedExpression, setSelectedExpression] = useState('');
   const [expressionList, setExpressionList] = useState([]);
-  const [result, setResult] = useState(null);
+  const [result, setResult] = useState([]);
   const [showResult, setShowResult] = useState(false);
 
   useEffect(() => {
@@ -49,13 +49,18 @@ const PayrollCheck = () => {
     payrollCheck(selectedTemplate, selectedExpression)
     .then(
       (response) => {
-        setResult(response.data[0]); // Store the result
+        setResult(response.data); // Store the result
         setShowResult(true); // Show the result
-        setTimeout(() => {
-          setShowResult(false); // Hide the result after a delay
-        }, 1000);
       }
     )
+  };
+
+  const handleCloseResult = () => {
+    setShowResult(false);
+  };
+
+  const renderIcon = (value) => {
+    return value === 'true' ? <FaCheck className="tick-icon" /> : <FaTimes className="cross-icon" />;
   };
 
   return (
@@ -97,8 +102,14 @@ const PayrollCheck = () => {
 
         {/* Conditionally render the result */}
         {showResult && (
-          <div className="result">
-            {result === 'true' ? <FaCheck className="tick-icon" /> : <FaTimes className="cross-icon" />}
+          <div className="result" style={{ width: '100%' }}>
+            {result.map((item, index) => (
+              <div key={index} style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>{item}</span>
+                <span>{renderIcon(item)}</span>
+              </div>
+            ))}
+            <button onClick={handleCloseResult} className="px-6 py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none text-lg">Close</button>
           </div>
         )}
       </form>
